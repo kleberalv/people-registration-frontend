@@ -2,33 +2,114 @@
   <v-dialog v-model="internalIsOpen" max-width="600px">
     <v-card>
       <v-card-title>
-        <span class="headline">{{ mode === 'view' ? 'Visualizar' : (mode === 'edit' ? 'Editar' : 'Cadastrar') }} Pessoa</span>
+        <span class="headline">{{ modalTitle }}</span>
       </v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid">
-          <v-text-field v-model="person.nome" :rules="getRules('nome')" label="Nome" :readonly="mode === 'view'" required></v-text-field>
-          <v-text-field v-model="person.nome_social" :rules="getRules('nome_social')" label="Nome Social" :readonly="mode === 'view'"></v-text-field>
-          <v-text-field v-model="person.cpf" :rules="getRules('cpf')" label="CPF" :readonly="mode === 'view'" required @input="formatCPF" maxlength="14"></v-text-field>
-          <v-text-field v-model="person.nome_pai" :rules="getRules('nome_pai')" label="Nome do Pai" :readonly="mode === 'view'"></v-text-field>
-          <v-text-field v-model="person.nome_mae" :rules="getRules('nome_mae')" label="Nome da Mãe" :readonly="mode === 'view'"></v-text-field>
-          <v-text-field v-model="person.telefone" :rules="getRules('telefone')" label="Telefone" :readonly="mode === 'view'" @input="formatTelefone" maxlength="15"></v-text-field>
-          <v-text-field v-model="person.email" :rules="getRules('email')" label="Email" :readonly="mode === 'view'"></v-text-field>
+          <v-text-field
+            v-model="person.nome"
+            :rules="getRules('nome')"
+            label="Nome"
+            :readonly="mode === 'view'"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="person.nome_social"
+            :rules="getRules('nome_social')"
+            label="Nome Social"
+            :readonly="mode === 'view'"
+          ></v-text-field>
+          <v-text-field
+            v-model="person.cpf"
+            :rules="getRules('cpf')"
+            label="CPF"
+            :readonly="mode === 'view'"
+            required
+            @input="formatCPF"
+            maxlength="14"
+            @keypress="validateNumber"
+          ></v-text-field>
+          <v-text-field
+            v-model="person.nome_pai"
+            :rules="getRules('nome_pai')"
+            label="Nome do Pai"
+            :readonly="mode === 'view'"
+          ></v-text-field>
+          <v-text-field
+            v-model="person.nome_mae"
+            :rules="getRules('nome_mae')"
+            label="Nome da Mãe"
+            :readonly="mode === 'view'"
+          ></v-text-field>
+          <v-text-field
+            v-model="person.telefone"
+            :rules="getRules('telefone')"
+            label="Telefone"
+            :readonly="mode === 'view'"
+            @input="formatTelefone"
+            maxlength="15"
+            @keypress="validateNumber"
+          ></v-text-field>
+          <v-text-field
+            v-model="person.email"
+            :rules="getRules('email')"
+            label="Email"
+            :readonly="mode === 'view'"
+          ></v-text-field>
         </v-form>
       </v-card-text>
       <v-card-subtitle v-if="mode !== 'view'">Endereços</v-card-subtitle>
       <v-card-text>
         <v-form ref="addressForm" v-model="addressValid" v-if="mode !== 'view'">
-          <v-radio-group v-model="address.tipo" :rules="getRules('tipo')" row>
+          <v-radio-group v-model="address.tipo" :rules="[rules.required]" row>
             <v-radio label="Residencial" value="Residencial"></v-radio>
             <v-radio label="Comercial" value="Comercial"></v-radio>
           </v-radio-group>
-          <v-text-field v-model="address.cep" :rules="getRules('cep')" label="CEP" @input="fetchAddress" maxlength="8"></v-text-field>
-          <v-text-field v-model="address.logradouro" :rules="getRules('logradouro')" label="Logradouro" readonly></v-text-field>
-          <v-text-field v-model="address.numero" :rules="getRules('numero')" label="Número"></v-text-field>
-          <v-text-field v-model="address.complemento" label="Complemento"></v-text-field>
-          <v-text-field v-model="address.bairro" :rules="getRules('bairro')" label="Bairro" readonly></v-text-field>
-          <v-text-field v-model="address.estado" :rules="getRules('estado')" label="Estado" readonly></v-text-field>
-          <v-text-field v-model="address.cidade" :rules="getRules('cidade')" label="Cidade" readonly></v-text-field>
+          <v-text-field
+            v-model="address.cep"
+            :rules="[rules.required, rules.cep]"
+            label="CEP"
+            @input="fetchAddress"
+            maxlength="8"
+            @keypress="validateNumber"
+          ></v-text-field>
+          <v-text-field
+            v-model="address.logradouro"
+            :rules="[rules.required]"
+            label="Logradouro"
+            readonly
+          ></v-text-field>
+          <v-text-field
+            v-model="address.numero"
+            :rules="[rules.required, rules.maxLength(20)]"
+            label="Número"
+            maxlength="20"
+            @keypress="validateNumber"
+          ></v-text-field>
+          <v-text-field
+            v-model="address.complemento"
+            :rules="[rules.maxLength(50)]"
+            label="Complemento"
+            maxlength="50"
+          ></v-text-field>
+          <v-text-field
+            v-model="address.bairro"
+            :rules="[rules.required]"
+            label="Bairro"
+            readonly
+          ></v-text-field>
+          <v-text-field
+            v-model="address.estado"
+            :rules="[rules.required]"
+            label="Estado"
+            readonly
+          ></v-text-field>
+          <v-text-field
+            v-model="address.cidade"
+            :rules="[rules.required]"
+            label="Cidade"
+            readonly
+          ></v-text-field>
           <v-btn :disabled="!addressValid" @click="addAddress">Adicionar Endereço</v-btn>
         </v-form>
         <v-data-table
@@ -73,11 +154,17 @@
         </v-card-title>
         <v-card-text>
           <v-form ref="editAddressForm" v-model="editAddressValid">
-            <v-text-field v-model="editAddress.tipo" :rules="getRules('tipo')" label="Tipo"></v-text-field>
-            <v-text-field v-model="editAddress.cep" :rules="getRules('cep')" label="CEP" @input="fetchEditAddress" maxlength="8"></v-text-field>
+            <v-select
+              v-model="editAddress.tipo"
+              :items="['Residencial', 'Comercial']"
+              :rules="getRules('tipo')"
+              label="Tipo"
+              required
+            ></v-select>
+            <v-text-field v-model="editAddress.cep" :rules="getRules('cep')" label="CEP" @input="fetchEditAddress" maxlength="8" @keypress="validateNumber"></v-text-field>
             <v-text-field v-model="editAddress.logradouro" :rules="getRules('logradouro')" label="Logradouro" readonly></v-text-field>
-            <v-text-field v-model="editAddress.numero" :rules="getRules('numero')" label="Número"></v-text-field>
-            <v-text-field v-model="editAddress.complemento" label="Complemento"></v-text-field>
+            <v-text-field v-model="editAddress.numero" :rules="getRules('numero')" label="Número" maxlength="20" @keypress="validateNumber"></v-text-field>
+            <v-text-field v-model="editAddress.complemento" label="Complemento" maxlength="50"></v-text-field>
             <v-text-field v-model="editAddress.bairro" :rules="getRules('bairro')" label="Bairro" readonly></v-text-field>
             <v-text-field v-model="editAddress.estado" :rules="getRules('estado')" label="Estado" readonly></v-text-field>
             <v-text-field v-model="editAddress.cidade" :rules="getRules('cidade')" label="Cidade" readonly></v-text-field>
@@ -107,7 +194,7 @@
       {{ snackbar.message }}
     </v-snackbar>
     <v-overlay :value="isProcessing" absolute>
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
+      <v-progress-circular indeterminate size="64" color="blue"></v-progress-circular>
     </v-overlay>
   </v-dialog>
 </template>
@@ -119,7 +206,7 @@ export default {
   props: {
     isOpen: Boolean,
     mode: String, // 'create', 'edit', 'view'
-    personId: Number
+    personData: Object
   },
   data() {
     return {
@@ -195,7 +282,7 @@ export default {
     isOpen(val) {
       this.internalIsOpen = val;
       if (val && this.mode !== 'create') {
-        this.fetchPerson();
+        this.setPersonFromTable();
       } else if (val && this.mode === 'create') {
         this.resetPerson();
       }
@@ -214,11 +301,25 @@ export default {
       if (val.length === 8) {
         this.fetchEditAddress();
       }
+    },
+    personData: {
+      handler(newData) {
+        if (newData) {
+          this.person = { ...newData };
+        }
+      },
+      deep: true
     }
   },
   methods: {
     getRules(field) {
       return this.showErrors ? this.rules[field] : [];
+    },
+    validateNumber(event) {
+      const key = event.key;
+      if (!/^\d$/.test(key)) {
+        event.preventDefault();
+      }
     },
     resetPerson() {
       this.person = {
@@ -233,12 +334,9 @@ export default {
       };
       this.resetAddressForm();
     },
-    async fetchPerson() {
-      try {
-        const response = await api.get(`/pessoas/${this.personId}`);
-        this.person = response.data;
-      } catch (error) {
-        console.error('Erro ao buscar detalhes da pessoa:', error);
+    setPersonFromTable() {
+      if (this.personData) {
+        this.person = { ...this.personData };
       }
     },
     formatCPF() {
@@ -287,10 +385,14 @@ export default {
       }
     },
     addAddress() {
+      this.showErrors = true;
       if (this.$refs.addressForm.validate()) {
         const newAddress = { ...this.address };
         this.person.enderecos.push(newAddress);
         this.resetAddressForm();
+        this.showErrors = false;
+      } else {
+        this.showSnackbar('Preencha todos os campos obrigatórios do endereço!', 'error');
       }
     },
     resetAddressForm() {
@@ -313,27 +415,51 @@ export default {
     closeEditAddressModal() {
       this.isEditAddressModalOpen = false;
     },
-    confirmEditAddress() {
+    async confirmEditAddress() {
       if (this.$refs.editAddressForm.validate()) {
         const index = this.person.enderecos.findIndex(a => a.id === this.editAddress.id);
         if (index !== -1) {
-          this.person.enderecos.splice(index, 1, { ...this.editAddress });
+          try {
+            this.isProcessing = true;
+            this.isEditAddressModalOpen = false;
+            await api.put(`/enderecos/${this.editAddress.id}`, this.editAddress);
+            this.person.enderecos.splice(index, 1, { ...this.editAddress });
+            this.showSnackbar('Endereço atualizado com sucesso!', 'success');
+          } catch (error) {
+            this.showSnackbar('Erro ao atualizar endereço!', 'error');
+            console.error('Erro ao atualizar endereço:', error);
+          } finally {
+            this.isProcessing = false;
+          }
         }
         this.isEditAddressModalOpen = false;
       }
+    },
+    async deleteAddress(address) {
+    const index = this.person.enderecos.indexOf(address);
+      if (index > -1) {
+        if (address.id) {
+          this.isProcessing = true;
+          this.isConfirmDialogOpen = false;
+          try {
+            await api.delete(`/enderecos/${address.id}`);
+            this.showSnackbar('Endereço excluído com sucesso!', 'success');
+          } catch (error) {
+            this.showSnackbar('Erro ao excluir endereço!', 'error');
+            console.error('Erro ao excluir endereço:', error);
+          } finally {
+            this.isProcessing = false;
+          }
+        }
+        this.person.enderecos.splice(index, 1);
+      }
+      this.isConfirmDialogOpen = false;
     },
     confirmDeleteAddress(address) {
       this.confirmDialogTitle = 'Confirmar Exclusão';
       this.confirmDialogMessage = 'Você tem certeza que deseja excluir este endereço?';
       this.confirmAction = () => this.deleteAddress(address);
       this.isConfirmDialogOpen = true;
-    },
-    deleteAddress(address) {
-      const index = this.person.enderecos.indexOf(address);
-      if (index > -1) {
-        this.person.enderecos.splice(index, 1);
-      }
-      this.isConfirmDialogOpen = false;
     },
     validateAndConfirmSubmit() {
       this.showErrors = true;
@@ -355,15 +481,16 @@ export default {
       try {
         if (this.mode === 'create') {
           const response = await api.post('/pessoas', personData);
+          this.showSnackbar('Pessoa criada com sucesso!', 'success');
           this.person.id = response.data.id;
           await this.submitAddresses();
-          this.showSnackbar('Pessoa criada com sucesso!', 'success');
         } else if (this.mode === 'edit') {
           await api.put(`/pessoas/${this.person.id}`, personData);
-          await this.submitAddresses();
           this.showSnackbar('Pessoa atualizada com sucesso!', 'success');
+          await this.submitAddresses();
         }
         this.internalIsOpen = false;
+        this.$emit('close');
       } catch (error) {
         console.error('Erro ao salvar pessoa:', error);
         this.showSnackbar('Erro ao salvar pessoa!', 'error');
@@ -375,6 +502,7 @@ export default {
       for (const address of this.person.enderecos) {
         if (!address.id) {
           await api.post(`/pessoas/${this.person.id}/enderecos`, address);
+          this.showSnackbar('Endereço cadastrado com sucesso', 'success');
         } else {
           await api.put(`/enderecos/${address.id}`, address);
         }
@@ -382,6 +510,7 @@ export default {
     },
     closeModal() {
       this.internalIsOpen = false;
+      this.$emit('close');
     },
     closeConfirmDialog() {
       this.isConfirmDialogOpen = false;
@@ -399,7 +528,14 @@ export default {
   },
   mounted() {
     if (this.isOpen && this.mode !== 'create') {
-      this.fetchPerson();
+      this.setPersonFromTable();
+    }
+  },
+  computed: {
+    modalTitle() {
+      if (this.mode === 'view') return 'Visualizar Pessoa';
+      if (this.mode === 'edit') return 'Editar Pessoa';
+      return 'Cadastrar Pessoa';
     }
   }
 };
@@ -408,6 +544,7 @@ export default {
 <style>
 .v-overlay__scrim {
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
+  z-index: 3000;
 }
 </style>
+

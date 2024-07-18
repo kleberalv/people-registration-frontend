@@ -1,21 +1,24 @@
 <template>
   <v-container>
     <v-row>
-      <v-col>
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="search"
           label="Pesquisar por nome, CPF ou ID"
           @input="filterTable"
+          append-icon="mdi-magnify"
+          clearable
         ></v-text-field>
       </v-col>
-      <v-col>
-        <v-btn @click="openModal('create')">Nova Pessoa</v-btn>
+      <v-col cols="12" md="6" class="text-right">
+        <v-btn color="primary" @click="openModal('create')">Nova Pessoa</v-btn>
       </v-col>
     </v-row>
     <v-data-table
       :headers="headers"
       :items="filteredPeople"
       item-key="id"
+      class="elevation-1"
     >
       <template v-slot:body="{ items }">
         <tbody>
@@ -24,10 +27,10 @@
             <td>{{ item.nome }}</td>
             <td>{{ item.cpf }}</td>
             <td>
-              <v-btn icon @click="openModal('view', item.id)">
+              <v-btn icon @click="openModal('view', item)">
                 <v-icon>mdi-eye</v-icon>
               </v-btn>
-              <v-btn icon @click="openModal('edit', item.id)">
+              <v-btn icon @click="openModal('edit', item)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
               <v-btn icon @click="confirmDeletePerson(item.id)">
@@ -40,9 +43,10 @@
     </v-data-table>
 
     <PersonModal
+      ref="personModal"
       :isOpen="isModalOpen"
       :mode="modalMode"
-      :personId="selectedPersonId"
+      :personData="selectedPersonData"
       @close="closeModal"
     />
 
@@ -63,7 +67,7 @@
       {{ snackbar.message }}
     </v-snackbar>
     <v-overlay :value="isProcessing" absolute>
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
+      <v-progress-circular indeterminate size="64" color="blue"></v-progress-circular>
     </v-overlay>
   </v-container>
 </template>
@@ -81,7 +85,7 @@ export default {
       search: '',
       isModalOpen: false,
       modalMode: 'create',
-      selectedPersonId: null,
+      selectedPersonData: null,
       isConfirmDialogOpen: false,
       isProcessing: false,
       confirmDialogTitle: '',
@@ -112,9 +116,9 @@ export default {
         console.error('Erro ao buscar pessoas:', error);
       }
     },
-    openModal(mode, id = null) {
+    openModal(mode, personData = null) {
       this.modalMode = mode;
-      this.selectedPersonId = id;
+      this.selectedPersonData = personData;
       this.isModalOpen = true;
     },
     closeModal() {
@@ -137,6 +141,7 @@ export default {
     },
     async deletePerson(id) {
       this.isProcessing = true;
+      this.isConfirmDialogOpen = false;
       try {
         await api.delete(`/pessoas/${id}`);
         this.fetchPeople();
@@ -146,7 +151,6 @@ export default {
         this.showSnackbar('Erro ao excluir pessoa!', 'error');
       } finally {
         this.isProcessing = false;
-        this.isConfirmDialogOpen = false;
       }
     },
     closeConfirmDialog() {
@@ -168,3 +172,10 @@ export default {
   }
 };
 </script>
+
+<style>
+.v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+}
+</style>
