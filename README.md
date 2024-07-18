@@ -6,7 +6,7 @@ Este repositório contém o código-fonte do frontend do projeto de cadastro de 
 
 ## Instruções
 
-1. Certifique-se de ler o README.md do [people-registration-backend](https://github.com/kleberalv/people-registration-backend/README.md) para garantir uma execução adequada e entender as dependências necessárias.
+1. Certifique-se de ler o README.md do [people-registration-backend](https://github.com/kleberalv/people-registration-backend/blob/master/README.md) para garantir uma execução adequada e entender as dependências necessárias.
 
 2. Caso deseje executar este projeto de frontend de forma independente, siga os passos abaixo:
 
