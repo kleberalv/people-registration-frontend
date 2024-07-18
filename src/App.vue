@@ -20,8 +20,6 @@
       <v-spacer></v-spacer>
 
       <v-btn text @click="goToHome">HOME</v-btn>
-      <v-btn text @click="goToCadastro">CADASTRO DE PESSOAS</v-btn>
-      <v-btn text @click="goToConsulta">CONSULTA DE PESSOAS</v-btn>
 
       <v-spacer></v-spacer>
 
